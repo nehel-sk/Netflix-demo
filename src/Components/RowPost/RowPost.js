@@ -1,11 +1,12 @@
 import React, { useEffect,useState } from 'react'
 import Youtube from 'react-youtube'
 import axios from '../../axios'
-import {imageUrl} from '../../constants/constants'
+import {API_KEY, imageUrl} from '../../constants/constants'
 import './RowPost.css'
 
 function RowPost(props) {
   const [movies,setMovies] = useState([])
+  const [urlId,setUrlId]=useState('')
   useEffect(() => {
     axios.get(props.url).then((response)=>{
       // console.log(response.data)
@@ -20,11 +21,19 @@ function RowPost(props) {
     height:'390',
     width:'100%',
     playerVars: {
-      autoplay: 0,
+      autoplay: 1,
   }}
   
   const handleMoiveTrailer=(id)=>{
     console.log(id)
+    axios.get(`/movie/${id}/videos?api_key=${API_KEY}&language=en-US`).then((response)=>{
+      if(response.data.length!==0){
+        setUrlId(response.data.results[0])
+      }else{
+        console.log('Array empty')
+      }
+      
+    })
   }
   return (
     <div className='row'>
@@ -35,9 +44,9 @@ function RowPost(props) {
             )}
             
         </div>
-        <Youtube opts={opts} videoId="2g811Eo7K8U"/>
+        { urlId && <Youtube opts={opts} videoId={urlId.key} />}
     </div>
   )
 }
-
+ 
 export default RowPost
